@@ -4,6 +4,6 @@
 #include <vector>
 
 // Function declaration
-std::vector<int> mergeSort(std::vector<int>& array);
+pair<vector<int>, pair<int, int>> mergeSort(std::vector<int> array);
 
 #endif /* MERGESORT_HPP */

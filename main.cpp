@@ -6,11 +6,12 @@
 #include "mergeSort.h"
 #include "insertionSort.h"
 #include "heapSort.h"
+#include "bubbleSort.h"
 
 int main()
 {
     std::vector<int> array = {64, 25, 12, 22, 11};
-    auto result = heapSort(array);
+    auto result = bubbleSort(array);
 
     // std::vector<int> sorted_array = result;
 

@@ -13,6 +13,7 @@
 #include "insertionSort.h"
 #include "heapSort.h"
 #include "bubbleSort.h"
+#include "splaySort.h"
 
 #include "datasetGenerator.h"
 
@@ -20,7 +21,7 @@ using namespace std;
 
 int main()
 {
-    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
+    std::vector<int> lengthLists = {10, 100, 1000, 10000};
     int NUMBER_INTERATIONS = 1;
 
     DatasetGenerator datasetGenerator(lengthLists);
@@ -32,39 +33,40 @@ int main()
     methods["insertionSort"] = insertionSort;
     methods["heapSort"] = heapSort;
     methods["bubbleSort"] = bubbleSort;
-
-
-    std::vector<std::vector<std::vector<int>>> datasets {
-        datasetGenerator.generateOrdered(),
-        datasetGenerator.generateOrderedInverse(),
-        datasetGenerator.generateAlmostOrdered(),
-        datasetGenerator.generateRandom()
-    };
-
-    std::vector<std::string> datasets_name = {
-        "Ordered",
-        "OrderedInverse",
-        "AlmostOrdered",
-        "Random"
-    };
+    methods["splaySort"] = splaySort;
 
     std::string csv = "Interation;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
 
     for (int iteration = 0; iteration < NUMBER_INTERATIONS; ++iteration) {
+
+        std::vector<std::vector<std::vector<int>>> datasets {
+            datasetGenerator.generateOrdered(),
+            datasetGenerator.generateOrderedInverse(),
+            datasetGenerator.generateAlmostOrdered(),
+            datasetGenerator.generateRandom()
+        };
+
+        std::vector<std::string> datasets_name = {
+            "Ordered",
+            "OrderedInverse",
+            "AlmostOrdered",
+            "Random"
+        };
+
         for (auto function = methods.begin(); function != methods.end(); ++function) {
 
             for (int i = 0; i < datasets.size(); ++i) {
                 for (int j = 0; j < datasets[i].size(); ++j) {
 
-                    auto start = std::chrono::high_resolution_clock::now();
-
+                    std::clock_t start = std::clock();
+                    
                     auto result = methods[function->first](datasets[i][j]);
 
-                    auto end = std::chrono::high_resolution_clock::now();
+                    std::clock_t end = std::clock();
 
-                    std::chrono::duration<double> diff = end-start;
+                    long double diff = 1000.0 * (end - start) / CLOCKS_PER_SEC;
 
-                    csv += std::to_string(iteration + 1) + ";" + function->first + ";" + datasets_name[i] + ";" + std::to_string(datasets[i][j].size()) + ";" + std::to_string(diff.count()) + ";" + std::to_string(result.second.first) + ";" + std::to_string(result.second.second) + "\n";
+                    csv += std::to_string(iteration + 1) + ";" + function->first + ";" + datasets_name[i] + ";" + std::to_string(datasets[i][j].size()) + ";" + std::to_string(diff) + ";" + std::to_string(result.second.first) + ";" + std::to_string(result.second.second) + "\n";
 
                 }
             }

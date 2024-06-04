@@ -1,5 +1,11 @@
 #include <iostream>
 #include <vector>
+#include <functional>
+#include <map>
+#include <string>
+#include <utility>
+#include <chrono>
+#include <fstream>
 
 #include "selectionSort.h"
 #include "quickSort.h"
@@ -8,25 +14,74 @@
 #include "heapSort.h"
 #include "bubbleSort.h"
 
+#include "datasetGenerator.h"
+
+using namespace std;
+
 int main()
 {
-    std::vector<int> array = {64, 25, 12, 22, 11};
-    auto result = bubbleSort(array);
+    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
+    int NUMBER_INTERATIONS = 1;
 
-    // std::vector<int> sorted_array = result;
+    DatasetGenerator datasetGenerator(lengthLists);
 
-    std::vector<int> sorted_array = result.first;
-    int comparisons = result.second.first;
-    int movements = result.second.second;
+    std::map<std::string, std::pair<std::vector<int>, std::pair<int, int>>(*)(std::vector<int>)> methods;
+    methods["selectionSort"] = selectionSort;
+    methods["quickSort"] = quickSort;
+    methods["mergeSort"] = mergeSort;
+    methods["insertionSort"] = insertionSort;
+    methods["heapSort"] = heapSort;
+    methods["bubbleSort"] = bubbleSort;
 
-    std::cout << "Sorted array: ";
-    for (int i = 0; i < sorted_array.size(); ++i) {
-        std::cout << sorted_array[i] << " ";
+
+    std::vector<std::vector<std::vector<int>>> datasets {
+        datasetGenerator.generateOrdered(),
+        datasetGenerator.generateOrderedInverse(),
+        datasetGenerator.generateAlmostOrdered(),
+        datasetGenerator.generateRandom()
+    };
+
+    std::vector<std::string> datasets_name = {
+        "Ordered",
+        "OrderedInverse",
+        "AlmostOrdered",
+        "Random"
+    };
+
+    std::string csv = "Interation;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
+
+    for (int iteration = 0; iteration < NUMBER_INTERATIONS; ++iteration) {
+        for (auto function = methods.begin(); function != methods.end(); ++function) {
+
+            for (int i = 0; i < datasets.size(); ++i) {
+                for (int j = 0; j < datasets[i].size(); ++j) {
+
+                    auto start = std::chrono::high_resolution_clock::now();
+
+                    auto result = methods[function->first](datasets[i][j]);
+
+                    auto end = std::chrono::high_resolution_clock::now();
+
+                    std::chrono::duration<double> diff = end-start;
+
+                    csv += std::to_string(iteration + 1) + ";" + function->first + ";" + datasets_name[i] + ";" + std::to_string(datasets[i][j].size()) + ";" + std::to_string(diff.count()) + ";" + std::to_string(result.second.first) + ";" + std::to_string(result.second.second) + "\n";
+
+                }
+            }
+        }
     }
-    std::cout << std::endl;
 
-    std::cout << "Number of comparisons: " << comparisons << std::endl;
-    std::cout << "Number of movements: " << movements << std::endl;
+    std::ofstream file("output.csv");
+
+    if (file.is_open())
+    {
+        file << csv;
+        file.close();
+    }
+    else 
+    {
+        std::cout << "Unable to open file";
+    }
 
     return 0;
 }

@@ -21,7 +21,7 @@ using namespace std;
 
 int main()
 {
-    std::vector<int> lengthLists = {10, 100, 1000, 10000};
+    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
     int NUMBER_INTERATIONS = 1;
 
     DatasetGenerator datasetGenerator(lengthLists);

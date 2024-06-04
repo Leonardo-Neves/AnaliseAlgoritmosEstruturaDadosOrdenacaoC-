@@ -6,6 +6,7 @@
 #include <utility>
 #include <chrono>
 #include <fstream>
+#include <random>
 
 #include "selectionSort.h"
 #include "quickSort.h"
@@ -21,7 +22,7 @@ using namespace std;
 
 int main()
 {
-    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
+    std::vector<int> lengthLists = {10, 100, 1000, 10000};
     int NUMBER_INTERATIONS = 1;
 
     DatasetGenerator datasetGenerator(lengthLists);
@@ -73,7 +74,12 @@ int main()
         }
     }
 
-    std::ofstream file("output.csv");
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(1, 10000000);
+    int random_value = distrib(gen);
+
+    std::ofstream file("output" + std::to_string(random_value) + ".csv");
 
     if (file.is_open())
     {

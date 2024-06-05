@@ -3,21 +3,21 @@
 
 using namespace std;
 
-pair<vector<int>, pair<int, int>>  insertionSort(vector<int> array);
+pair<vector<long long>, pair<long long, long long>>  insertionSort(vector<long long> array);
 
-pair<vector<int>, pair<int, int>> insertionSort(vector<int> array) {
+pair<vector<long long>, pair<long long, long long>> insertionSort(vector<long long> array) {
 
-    int counter_comparisons = 0;
-    int counter_movements = 0;
+    long long counter_comparisons = 0;
+    long long counter_movements = 0;
 
-    for (int i = 1; i < array.size(); ++i) {
+    for (long long i = 1; i < array.size(); ++i) {
         counter_comparisons++;
 
         counter_movements += 2;
-        int aux = array[i];
-        int j = i - 1;
+        long long aux = array[i];
+        long long j = i - 1;
 
-        for (int k = j; k >= 0; --k) {
+        for (long long k = j; k >= 0; --k) {
             counter_comparisons++;
 
             counter_comparisons++;

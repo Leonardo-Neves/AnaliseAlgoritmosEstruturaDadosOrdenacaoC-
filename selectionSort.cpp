@@ -3,19 +3,19 @@
 
 using namespace std;
 
-pair<vector<int>, pair<int, int>> selectionSort(vector<int> array) {
-    vector<int> A = array;
-    int aux = 0, n = array.size();
+pair<vector<long long>, pair<long long, long long>> selectionSort(vector<long long> array) {
+    vector<long long> A = array;
+    long long aux = 0, n = array.size();
     
-    int counter_comparisons = 0;
-    int counter_movements = 0;
+    long long counter_comparisons = 0;
+    long long counter_movements = 0;
 
-    for (int i = 0; i < n - 1; ++i) {
+    for (long long i = 0; i < n - 1; ++i) {
         counter_comparisons++;
 
-        int min = i;
+        long long min = i;
 
-        for (int j = i + 1; j < n; ++j) {
+        for (long long j = i + 1; j < n; ++j) {
             counter_comparisons++;
 
             if (A[j] < A[min]) {

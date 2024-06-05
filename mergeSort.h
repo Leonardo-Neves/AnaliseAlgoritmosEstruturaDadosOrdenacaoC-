@@ -3,7 +3,9 @@
 
 #include <vector>
 
-// Function declaration
-pair<vector<int>, pair<int, int>> mergeSort(std::vector<int> array);
+using namespace std;
 
-#endif /* MERGESORT_HPP */
+// Function declaration
+pair<vector<long long>, pair<long long, long long>> mergeSort(std::vector<long long> array);
+
+#endif /* MERGESORT_H */

@@ -4,12 +4,12 @@
 using namespace std;
 
 struct Node {
-    int key;
+    long long key;
     Node* left;
     Node* right;
 };
 
-pair<Node*, pair<int, int>> criar_no(int chave, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> criar_no(long long chave, long long counter_comparisons, long long counter_movements) {
     Node* no = new Node();
 
     counter_movements += 3;
@@ -19,7 +19,7 @@ pair<Node*, pair<int, int>> criar_no(int chave, int counter_comparisons, int cou
     return make_pair(no, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<Node*, pair<int, int>> rotacionar_dir(Node* x, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> rotacionar_dir(Node* x, long long counter_comparisons, long long counter_movements) {
     counter_movements += 3;
     Node* y = x->left;
     x->left = y->right;
@@ -27,7 +27,7 @@ pair<Node*, pair<int, int>> rotacionar_dir(Node* x, int counter_comparisons, int
     return make_pair(y, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<Node*, pair<int, int>> rotacionar_esq(Node* x, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> rotacionar_esq(Node* x, long long counter_comparisons, long long counter_movements) {
     counter_movements += 3;
     Node* y = x->right;
     x->right = y->left;
@@ -35,7 +35,7 @@ pair<Node*, pair<int, int>> rotacionar_esq(Node* x, int counter_comparisons, int
     return make_pair(y, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<Node*, pair<int, int>> splay(Node* raiz, int chave, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> splay(Node* raiz, long long chave, long long counter_comparisons, long long counter_movements) {
     counter_comparisons++;
     if (raiz == nullptr || raiz->key == chave) {
         return make_pair(raiz, make_pair(counter_comparisons, counter_movements));
@@ -167,7 +167,7 @@ pair<Node*, pair<int, int>> splay(Node* raiz, int chave, int counter_comparisons
     }
 }
 
-pair<Node*, pair<int, int>> insere(Node* raiz, int chave, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> insere(Node* raiz, long long chave, long long counter_comparisons, long long counter_movements) {
 
     counter_comparisons++;
     if (raiz == nullptr) {
@@ -212,7 +212,7 @@ pair<Node*, pair<int, int>> insere(Node* raiz, int chave, int counter_comparison
     return make_pair(novo_no, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<Node*, pair<int, int>> deleta(Node* raiz, int chave, int counter_comparisons, int counter_movements) {
+pair<Node*, pair<long long, long long>> deleta(Node* raiz, long long chave, long long counter_comparisons, long long counter_movements) {
 
     counter_comparisons++;
     if (raiz == nullptr) {
@@ -258,7 +258,7 @@ pair<Node*, pair<int, int>> deleta(Node* raiz, int chave, int counter_comparison
     return make_pair(raiz, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<int, pair<int, int>> minimo(Node* raiz, int counter_comparisons, int counter_movements) {
+pair<long long, pair<long long, long long>> minimo(Node* raiz, long long counter_comparisons, long long counter_movements) {
 
     counter_comparisons++;
     if (raiz == nullptr) {
@@ -278,7 +278,7 @@ pair<int, pair<int, int>> minimo(Node* raiz, int counter_comparisons, int counte
     return make_pair(no->key, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<pair<int, Node*>, pair<int, int>> extrai_minimo(Node* raiz, int counter_comparisons, int counter_movements) {
+pair<pair<long long, Node*>, pair<long long, long long>> extrai_minimo(Node* raiz, long long counter_comparisons, long long counter_movements) {
 
     counter_comparisons++;
     if (raiz == nullptr) {
@@ -287,7 +287,7 @@ pair<pair<int, Node*>, pair<int, int>> extrai_minimo(Node* raiz, int counter_com
 
     auto result1 = minimo(raiz, counter_comparisons, counter_movements);
 
-    int min_chave = result1.first;
+    long long min_chave = result1.first;
     counter_comparisons = result1.second.first;
     counter_movements = result1.second.second;
     counter_movements++;
@@ -302,13 +302,13 @@ pair<pair<int, Node*>, pair<int, int>> extrai_minimo(Node* raiz, int counter_com
     return {{ min_chave, raiz }, {counter_comparisons, counter_movements}};
 }
 
-pair<vector<int>, pair<int, int>> splaySort(vector<int> A) {
+pair<vector<long long>, pair<long long, long long>> splaySort(vector<long long> A) {
 
-    int counter_comparisons = 0;
-    int counter_movements = 0;
+    long long counter_comparisons = 0;
+    long long counter_movements = 0;
 
     Node* raiz = nullptr;
-    for (int x : A) {
+    for (long long x : A) {
         auto result1 = insere(raiz, x, counter_comparisons, counter_movements);
 
         raiz = result1.first;
@@ -318,13 +318,13 @@ pair<vector<int>, pair<int, int>> splaySort(vector<int> A) {
     }
         
 
-    vector<int> B;
+    vector<long long> B;
     while (raiz != nullptr) {
         counter_comparisons++;
 
         auto result2 = extrai_minimo(raiz, counter_comparisons, counter_movements);
 
-        pair<int, Node*> min_node = result2.first;
+        pair<long long, Node*> min_node = result2.first;
         counter_comparisons = result2.second.first;
         counter_movements = result2.second.second;
         counter_movements++;
@@ -338,13 +338,13 @@ pair<vector<int>, pair<int, int>> splaySort(vector<int> A) {
     return make_pair(B, make_pair(counter_comparisons, counter_movements));
 }
 
-// int main() {
-//     vector<int> A = { 10, 3, 8, 15, 6, 1 };
+// long long main() {
+//     vector<long long> A = { 10, 3, 8, 15, 6, 1 };
 //     auto result = splaySort(A);
 
-//     vector<int> sorted_A = result.first;
+//     vector<long long> sorted_A = result.first;
 
-//     for (int x : sorted_A) {
+//     for (long long x : sorted_A) {
 //         cout << x << "\n";
 //     }
 //     cout << endl;

@@ -3,14 +3,14 @@
 
 using namespace std;
 
-pair<vector<int>, pair<int, int>> reDoMaximum(vector<int> A, int esq, int dir, int counter_comparisons, int counter_movements);
-pair<vector<int>, pair<int, int>> buildMaximum(vector<int> A, int n, int counter_comparisons, int counter_movements);
-pair<vector<int>, pair<int, int>> heapSort(vector<int> A);
+pair<vector<long long>, pair<long long, long long>> reDoMaximum(vector<long long> A, long long esq, long long dir, long long counter_comparisons, long long counter_movements);
+pair<vector<long long>, pair<long long, long long>> buildMaximum(vector<long long> A, long long n, long long counter_comparisons, long long counter_movements);
+pair<vector<long long>, pair<long long, long long>> heapSort(vector<long long> A);
 
-pair<vector<int>, pair<int, int>> reDoMaximum(vector<int> A, int esq, int dir, int counter_comparisons, int counter_movements) {
-    int i = esq;
-    int j = i * 2 + 1;
-    int aux = A[i];
+pair<vector<long long>, pair<long long, long long>> reDoMaximum(vector<long long> A, long long esq, long long dir, long long counter_comparisons, long long counter_movements) {
+    long long i = esq;
+    long long j = i * 2 + 1;
+    long long aux = A[i];
     counter_movements+=3;
 
     while (j <= dir) {
@@ -39,8 +39,8 @@ pair<vector<int>, pair<int, int>> reDoMaximum(vector<int> A, int esq, int dir, i
     return make_pair(A, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<vector<int>, pair<int, int>> buildMaximum(vector<int> A, int n, int counter_comparisons, int counter_movements) {
-    for (int esq = (n / 2) - 1; esq >= 0; esq--) {
+pair<vector<long long>, pair<long long, long long>> buildMaximum(vector<long long> A, long long n, long long counter_comparisons, long long counter_movements) {
+    for (long long esq = (n / 2) - 1; esq >= 0; esq--) {
         counter_comparisons++;
 
         auto result = reDoMaximum(A, esq, n - 1, counter_comparisons, counter_movements);
@@ -53,9 +53,9 @@ pair<vector<int>, pair<int, int>> buildMaximum(vector<int> A, int n, int counter
     return make_pair(A, make_pair(counter_comparisons, counter_movements));
 }
 
-pair<vector<int>, pair<int, int>> heapSort(vector<int> A) {
-    int counter_comparisons = 0;
-    int counter_movements = 0;
+pair<vector<long long>, pair<long long, long long>> heapSort(vector<long long> A) {
+    long long counter_comparisons = 0;
+    long long counter_movements = 0;
 
     auto result = buildMaximum(A, A.size(), counter_comparisons, counter_movements);
 
@@ -64,7 +64,7 @@ pair<vector<int>, pair<int, int>> heapSort(vector<int> A) {
     counter_movements = result.second.second;
     counter_movements++;
 
-    for (int m = A.size() - 1; m > 0; m--) {
+    for (long long m = A.size() - 1; m > 0; m--) {
         counter_comparisons++;
         
         swap(A[0], A[m]);

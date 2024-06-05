@@ -7,6 +7,6 @@
 using namespace std;
 
 // Function prototype
-pair<vector<int>, pair<int, int>> heapSort(vector<int> array);
+pair<vector<long long>, pair<long long, long long>> heapSort(vector<long long> array);
 
 #endif // HEAPSORT_H

@@ -7,6 +7,6 @@
 using namespace std;
 
 // Function prototype
-pair<vector<int>, pair<int, int>> insertionSort(std::vector<int> array);
+pair<vector<long long>, pair<long long, long long>> insertionSort(std::vector<long long> array);
 
 #endif // INSERTIONSORT_H

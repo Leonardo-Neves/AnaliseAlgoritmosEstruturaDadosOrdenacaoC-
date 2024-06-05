@@ -7,6 +7,6 @@
 using namespace std;
 
 // Function prototype
-pair<vector<int>, pair<int, int>> quickSort(std::vector<int> array);
+pair<vector<long long>, pair<long long, long long>> quickSort(std::vector<long long> array);
 
 #endif // QUICKSORT_H

@@ -7,6 +7,6 @@
 using namespace std;
 
 // Function prototype
-pair<vector<int>, pair<int, int>> splaySort(std::vector<int> array);
+pair<vector<long long>, pair<long long, long long>> splaySort(std::vector<long long> array);
 
 #endif // SPLAYSORT_H

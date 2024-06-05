@@ -7,6 +7,6 @@
 using namespace std;
 
 // Function prototype
-pair<vector<int>, pair<int, int>> bubbleSort(vector<int> array);
+pair<vector<long long>, pair<long long, long long>> bubbleSort(vector<long long> array);
 
 #endif // BUBBLESORT_H

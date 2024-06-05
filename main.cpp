@@ -7,6 +7,11 @@
 #include <chrono>
 #include <fstream>
 #include <random>
+#include <ctime>
+#include <mutex>
+#include <thread>
+#include <atomic>
+#include <iomanip>
 
 #include "selectionSort.h"
 #include "quickSort.h"
@@ -20,9 +25,36 @@
 
 using namespace std;
 
+std::mutex mtx;
+
+std::string csv = "Interation;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
+
+void runExperiment(
+    int iteration, 
+    const std::string& functionName,
+    const std::function<std::pair<std::vector<int>, 
+    std::pair<int, int>>(std::vector<int>)>& method,
+    const std::vector<int>& dataset, 
+    const std::string& datasetName, 
+    std::ofstream& file
+) {
+
+    std::clock_t start = std::clock();
+    auto result = method(dataset);
+    std::clock_t end = std::clock();
+    long double diff = 1000.0 * (end - start) / CLOCKS_PER_SEC;
+
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        file << iteration + 1 << ";" << functionName << ";" << datasetName << ";" 
+             << dataset.size() << ";" << diff << ";" << result.second.first << ";" 
+             << result.second.second << "\n";
+    }
+}
+
 int main()
 {
-    std::vector<int> lengthLists = {10, 100};
+    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
     int NUMBER_INTERATIONS = 1;
 
     DatasetGenerator datasetGenerator(lengthLists);
@@ -36,59 +68,56 @@ int main()
     methods["bubbleSort"] = bubbleSort;
     methods["splaySort"] = splaySort;
 
-    std::string csv = "Interation;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::tm* now_tm = std::localtime(&now_time);
 
-    for (int iteration = 0; iteration < NUMBER_INTERATIONS; ++iteration) {
+    char filename[100];
+    std::strftime(filename, sizeof(filename), "output_%Y-%m-%d_%H-%M-%S.csv", now_tm);
 
-        std::vector<std::vector<std::vector<int>>> datasets {
-            datasetGenerator.generateOrdered(),
-            datasetGenerator.generateOrderedInverse(),
-            datasetGenerator.generateAlmostOrdered(),
-            datasetGenerator.generateRandom()
-        };
+    std::ofstream file(filename);
 
-        std::vector<std::string> datasets_name = {
-            "Ordered",
-            "OrderedInverse",
-            "AlmostOrdered",
-            "Random"
-        };
+    if (file.is_open()) {
 
-        for (auto function = methods.begin(); function != methods.end(); ++function) {
+        file << "Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
 
-            for (int i = 0; i < datasets.size(); ++i) {
-                for (int j = 0; j < datasets[i].size(); ++j) {
+        for (int iteration = 0; iteration < NUMBER_INTERATIONS; ++iteration) {
 
-                    std::clock_t start = std::clock();
-                    
-                    auto result = methods[function->first](datasets[i][j]);
+            
 
-                    std::clock_t end = std::clock();
+            std::vector<std::vector<std::vector<int>>> datasets {
+                datasetGenerator.generateOrdered(),
+                datasetGenerator.generateOrderedInverse(),
+                datasetGenerator.generateAlmostOrdered(),
+                datasetGenerator.generateRandom()
+            };
 
-                    long double diff = 1000.0 * (end - start) / CLOCKS_PER_SEC;
+            std::vector<std::string> datasets_name = {
+                "Ordered",
+                "OrderedInverse",
+                "AlmostOrdered",
+                "Random"
+            };
 
-                    csv += std::to_string(iteration + 1) + ";" + function->first + ";" + datasets_name[i] + ";" + std::to_string(datasets[i][j].size()) + ";" + std::to_string(diff) + ";" + std::to_string(result.second.first) + ";" + std::to_string(result.second.second) + "\n";
+            for (auto function = methods.begin(); function != methods.end(); ++function) {
 
+                std::vector<std::thread> threads;
+
+                for (int i = 0; i < datasets.size(); ++i) {
+                    for (int j = 0; j < datasets[i].size(); ++j) {
+                        threads.emplace_back(runExperiment, iteration, function->first, function->second, datasets[i][j], datasets_name[i], std::ref(file));
+                    }
+                }
+
+                for (int i = 0; i < threads.size(); ++i) {
+                    threads[i].join();
                 }
             }
+
+            
         }
-    }
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(1, 10000000);
-    int random_value = distrib(gen);
-
-    std::ofstream file("output" + std::to_string(random_value) + ".csv");
-
-    if (file.is_open())
-    {
-        file << csv;
         file.close();
-    }
-    else 
-    {
-        std::cout << "Unable to open file";
     }
 
     return 0;

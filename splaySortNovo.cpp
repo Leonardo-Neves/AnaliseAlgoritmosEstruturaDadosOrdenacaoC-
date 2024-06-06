@@ -210,6 +210,8 @@ pair<vector<long long>, pair<long long, long long>> splaySort(vector<long long> 
     long long counter_comparisons = 0;
     long long counter_movements = 0;
 
+    cout  << "salkdnaslkdnsaldkjnasldknaskdn ";
+
     Node* raiz = nullptr;
     for (long long x : A) {
         counter_comparisons++;

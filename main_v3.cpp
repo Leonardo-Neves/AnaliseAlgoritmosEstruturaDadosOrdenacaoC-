@@ -19,7 +19,8 @@
 #include "insertionSort.h"
 #include "heapSort.h"
 #include "bubbleSort.h"
-#include "splaySort.h"
+// #include "splaySort.h"
+#include "splaySortNovo.h"
 
 #include "datasetGenerator_v2.h"
 
@@ -127,7 +128,7 @@ std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<lon
 
 int main()
 {
-    long long NUMBER_INTERATIONS = 50;
+    long long NUMBER_INTERATIONS = 1;
 
     std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods;
     methods["selectionSort"] = selectionSort;

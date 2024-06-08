@@ -68,7 +68,7 @@ pair<Node*, pair<long long, long long>> splay(Node* raiz, long long chave, long 
             counter_movements = result2.second.second;
             counter_movements++;
 
-        } else if (raiz->left->key < chave) {
+        } else if (raiz->left->key <= chave) {
             counter_comparisons++;
 
             counter_comparisons++;
@@ -132,7 +132,7 @@ pair<Node*, pair<long long, long long>> splay(Node* raiz, long long chave, long 
                 counter_movements++;
             }
                 
-        } else if (raiz->right->key < chave) {
+        } else if (raiz->right->key <= chave) {
             counter_comparisons++;
 
             counter_comparisons++;

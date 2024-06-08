@@ -70,3 +70,17 @@ std::vector<long long> DatasetGenerator::generateRandom(long long length) {
     
     return randomList;
 }
+
+std::vector<long long> DatasetGenerator::generateRandomWithRepeats(long long length) {
+    std::vector<long long> result;
+
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<long long> dis(0, length);
+
+    for (size_t i = 0; i < length; ++i) {
+        result.push_back(dis(gen));
+    }
+
+    return result;
+}

@@ -302,41 +302,77 @@ pair<pair<long long, Node*>, pair<long long, long long>> extrai_minimo(Node* rai
     return {{ min_chave, raiz }, {counter_comparisons, counter_movements}};
 }
 
-pair<vector<long long>, pair<long long, long long>> splaySort(vector<long long> A) {
 
+
+pair<long long, long long> inorderTraversal(Node* raiz, vector<long long>& result, long long counter_comparisons, long long counter_movements) {
+    counter_comparisons++;
+    if (raiz == nullptr) {
+        return {counter_comparisons, counter_movements};
+    }
+    inorderTraversal(raiz->left, result, counter_comparisons, counter_movements);
+    result.push_back(raiz->key);
+    counter_movements++;
+    inorderTraversal(raiz->right, result, counter_comparisons, counter_movements);
+    return make_pair(counter_comparisons, counter_movements);
+}
+
+pair<vector<long long>, pair<long long, long long>> splaySort(vector<long long> A) {
     long long counter_comparisons = 0;
     long long counter_movements = 0;
 
     Node* raiz = nullptr;
     for (long long x : A) {
-        auto result1 = insere(raiz, x, counter_comparisons, counter_movements);
-
-        raiz = result1.first;
-        counter_comparisons = result1.second.first;
-        counter_movements = result1.second.second;
+        auto result = insere(raiz, x, counter_comparisons, counter_movements);
+        raiz = result.first;
+        counter_comparisons = result.second.first;
+        counter_movements = result.second.second;
         counter_movements++;
     }
+
+    vector<long long> sorted_A;
+    auto result2 = inorderTraversal(raiz, sorted_A, counter_comparisons, counter_movements);
+    counter_comparisons = result2.first;
+    counter_movements = result2.second;
+    counter_movements++;
+
+    return make_pair(sorted_A, make_pair(counter_comparisons, counter_movements));
+}
+
+// pair<vector<long long>, pair<long long, long long>> splaySort(vector<long long> A) {
+
+//     long long counter_comparisons = 0;
+//     long long counter_movements = 0;
+
+//     Node* raiz = nullptr;
+//     for (long long x : A) {
+//         auto result1 = insere(raiz, x, counter_comparisons, counter_movements);
+
+//         raiz = result1.first;
+//         counter_comparisons = result1.second.first;
+//         counter_movements = result1.second.second;
+//         counter_movements++;
+//     }
         
 
-    vector<long long> B;
-    while (raiz != nullptr) {
-        counter_comparisons++;
+//     vector<long long> B;
+//     while (raiz != nullptr) {
+//         counter_comparisons++;
 
-        auto result2 = extrai_minimo(raiz, counter_comparisons, counter_movements);
+//         auto result2 = extrai_minimo(raiz, counter_comparisons, counter_movements);
 
-        pair<long long, Node*> min_node = result2.first;
-        counter_comparisons = result2.second.first;
-        counter_movements = result2.second.second;
-        counter_movements++;
+//         pair<long long, Node*> min_node = result2.first;
+//         counter_comparisons = result2.second.first;
+//         counter_movements = result2.second.second;
+//         counter_movements++;
 
-        B.push_back(min_node.first);
+//         B.push_back(min_node.first);
 
-        counter_movements++;
-        raiz = min_node.second;
-    }
+//         counter_movements++;
+//         raiz = min_node.second;
+//     }
     
-    return make_pair(B, make_pair(counter_comparisons, counter_movements));
-}
+//     return make_pair(B, make_pair(counter_comparisons, counter_movements));
+// }
 
 // long long main() {
 //     vector<long long> A = { 10, 3, 8, 15, 6, 1 };

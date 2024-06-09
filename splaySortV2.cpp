@@ -34,98 +34,75 @@ unique_ptr<Node> rotacionar_esq(unique_ptr<Node> x, long long* counter_compariso
 }
 
 Node* splay(unique_ptr<Node>& raiz, long long chave, long long* counter_comparisons, long long* counter_movements) {
-    //(*counter_comparisons)++;
     if (raiz == nullptr || raiz->key == chave) {
         return raiz.get();
     }
 
-    //(*counter_comparisons)++;
-    if (raiz->key > chave) {
+    unique_ptr<Node> header = make_unique<Node>(0);
+    Node* left_tree = header.get();
+    Node* right_tree = header.get();
+    unique_ptr<Node> temp = nullptr;
 
-        if (raiz->left == nullptr) {
-            //(*counter_comparisons)++;
-            return raiz.get();
-        }
-        
-        if (raiz->left->key > chave) {
-            //(*counter_comparisons)++;
+    Node* current = raiz.release();
 
-            //(*counter_comparisons)++;
-            if (raiz->left->left != nullptr) {
-                raiz->left->left.reset(splay(raiz->left->left, chave, counter_comparisons, counter_movements));
-                //(*counter_movements)++;
+    while (true) {
+        (*counter_comparisons)++;
+        if (chave < current->key) {
+            if (current->left == nullptr) {
+                break;
             }
-                
-            raiz = rotacionar_dir(move(raiz), counter_comparisons, counter_movements);
-            //(*counter_movements)++;
-
-        } else if (raiz->left->key < chave) {
-            //(*counter_comparisons)++;
-
-            //(*counter_comparisons)++;
-            if (raiz->left->right != nullptr) {
-                raiz->left->right.reset(splay(raiz->left->right, chave, counter_comparisons, counter_movements));
-                //(*counter_movements)++;
+            (*counter_comparisons)++;
+            if (chave < current->left->key) {
+                // Zig-Zig
+                temp = move(current->left);
+                current->left = move(temp->right);
+                temp->right.reset(current);
+                current = temp.release();
+                (*counter_movements)++;
+                (*counter_comparisons)++;
+                if (current->left == nullptr) {
+                    break;
+                }
             }
-            
-            //(*counter_comparisons)++;
-            if (raiz->left->right != nullptr) {
-                raiz->left = rotacionar_esq(move(raiz->left), counter_comparisons, counter_movements);
-                //(*counter_movements)++;
+            // Link right
+            right_tree->left.reset(current);
+            right_tree = current;
+            current = current->left.release();
+            (*counter_movements)++;
+        } else if (chave > current->key) {
+            if (current->right == nullptr) {
+                break;
             }
-        }
-
-        //(*counter_comparisons)++;
-        if (raiz->left != nullptr) {
-            raiz = rotacionar_dir(move(raiz), counter_comparisons, counter_movements);
-            //(*counter_movements)++;
-        }
-
-        // return raiz.get();
-    } else {
-
-        //(*counter_comparisons)++;
-        if (raiz->right == nullptr) {
-            return raiz.get();
-        }
-
-        if (raiz->right->key > chave) {
-            //(*counter_comparisons)++;
-
-            //(*counter_comparisons)++;
-            if (raiz->right->left != nullptr) {
-                raiz->right->left.reset(splay(raiz->right->left, chave, counter_comparisons, counter_movements));
-                //(*counter_movements)++;
+            (*counter_comparisons)++;
+            if (chave > current->right->key) {
+                // Zag-Zag
+                temp = move(current->right);
+                current->right = move(temp->left);
+                temp->left.reset(current);
+                current = temp.release();
+                (*counter_movements)++;
+                (*counter_comparisons)++;
+                if (current->right == nullptr) {
+                    break;
+                }
             }
-            
-            //(*counter_comparisons)++;
-            if (raiz->right->left != nullptr) {
-                raiz->right = rotacionar_dir(move(raiz->right), counter_comparisons, counter_movements);
-                //(*counter_movements)++;
-            }
-                
-        } else if (raiz->right->key < chave) {
-            //(*counter_comparisons)++;
-
-            //(*counter_comparisons)++;
-            if (raiz->right->right != nullptr) {
-                raiz->right->right.reset(splay(raiz->right->right, chave, counter_comparisons, counter_movements));
-                //(*counter_movements)++;
-            }
-                
-            raiz = rotacionar_esq(move(raiz), counter_comparisons, counter_movements);
-            //(*counter_movements)++;
+            // Link left
+            left_tree->right.reset(current);
+            left_tree = current;
+            current = current->right.release();
+            (*counter_movements)++;
+        } else {
+            break;
         }
-
-        //(*counter_comparisons)++;
-        if (raiz->right != nullptr) {
-            raiz = rotacionar_esq(move(raiz), counter_comparisons, counter_movements);
-            //(*counter_movements)++;
-        }
-            
-        
     }
 
+    // Assemble
+    left_tree->right.reset(current->left.release());
+    right_tree->left.reset(current->right.release());
+    current->left.reset(header->right.release());
+    current->right.reset(header->left.release());
+    
+    raiz.reset(current);
     return raiz.get();
 }
 

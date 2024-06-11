@@ -27,16 +27,8 @@ using namespace std;
 
 std::mutex mtx;
 
-void runExperiment(
-    long long iteration, 
-    const std::string& functionName,
-    const std::function<std::pair<std::vector<long long>, 
-    std::pair<long long, long long>>(std::vector<long long>)>& method,
-    const std::vector<long long>& dataset, 
-    const std::string& datasetName, 
-    std::ofstream& file
-) {
-
+// Este método é responsável em executar um algoritmo, medir o tempo de CPU time e gravar os resultados de movimentações, comparações e tempo de execução em um arquivo CSV
+void runExperiment(long long iteration, const std::string& functionName, const std::function<std::pair<std::vector<long long>, std::pair<long long, long long>>(std::vector<long long>)>& method, const std::vector<long long>& dataset, const std::string& datasetName, std::ofstream& file) {
     std::clock_t start = std::clock();
     auto result = method(dataset);
     std::clock_t end = std::clock();
@@ -50,7 +42,8 @@ void runExperiment(
     }
 }
 
-void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods, long long iteration, std::vector<std::vector<std::vector<long long>>> datasets, std::vector<std::string> datasets_name, std::string posfixo) {
+// Este método é responsável por executar um interação do código, o que envolve executar um conjunto de dados sobre uma série de métodos utilizando computação paralela
+void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods, long long iteration, std::vector<std::vector<std::vector<long long>>> datasets, std::vector<std::string> datasets_name, std::string output_path, std::string posfixo = "") {
 
     for (auto function = methods.begin(); function != methods.end(); ++function) {
 
@@ -60,7 +53,7 @@ void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::
 
         char time_str[100];
         std::strftime(time_str, sizeof(time_str), "%Y-%m-%d_%H-%M-%S", now_tm);
-        std::string filename = "/home/leo/AnaliseAlgoritmosEstruturaDadosOrdenacaoC-/output/output_" + function->first + "_" + std::string(time_str) + "_" + std::to_string(iteration) + "_" + posfixo + ".csv";
+        std::string filename = output_path + "/output_" + function->first + "_" + std::string(time_str) + "_" + std::to_string(iteration) + "_" + posfixo + ".csv";
         std::ofstream file(filename);
 
         if (file.is_open()) {
@@ -84,7 +77,8 @@ void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::
     }
 }
 
-std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<long long> lengthLists, long long repeat) {
+// Este método é responsável por gerar um conjunto de dados baseado em um vetor de entrada, que em cada posição do vetor, um número indicando o comprimento do vetor que será gerado
+std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<long long> lengthLists) {
 
     DatasetGenerator datasetGenerator;
 
@@ -127,8 +121,11 @@ std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<lon
 
 int main()
 {
-    long long NUMBER_INTERATIONS = 50;
+    // Configurações Iniciais
+    long long NUMBER_INTERATIONS = 50; // Número de interações que o código vai executar
+    std::string output_path = "/home/leo/AnaliseAlgoritmosEstruturaDadosOrdenacaoC-/output" // Caminho de saída do resultado
 
+    // Configuração dos métodos que será utilizado em cada interação
     std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods;
     methods["selectionSort"] = selectionSort;
     methods["quickSort"] = quickSort;
@@ -138,6 +135,7 @@ int main()
     methods["bubbleSort"] = bubbleSort;
     methods["splaySort"] = splaySort;
 
+    // Nome dos conjuntos de dados, informação que será utilizada posteriormente como identificador no arquivo CSV de resultado
     std::vector<std::string> datasets_name = {
         "Ordered",
         "OrderedInverse",
@@ -145,19 +143,22 @@ int main()
         "Random"
     };
 
+    // Executando as interações
     for (long long i = 0; i < NUMBER_INTERATIONS; ++i) {
 
+        // Gerando um dataset para está interação, executando primeiro para vetores do tamanho, 10, 100, 1.000 e 10.000
         std::vector<long long> lengthLists1 = {10, 100, 1000, 10000};
+        std::vector<std::vector<std::vector<long long>>> datasets1 = generateDataset(lengthLists1);
 
-        std::vector<std::vector<std::vector<long long>>> datasets1 = generateDataset(lengthLists1, datasets_name.size());
+        // Executando a primeira parte da interação
+        runInteration(methods, i, datasets1, datasets_name, output_path, "1");
 
-        runInteration(methods, i, datasets1, datasets_name, "1");
-
+        // Gerando um dataset para está interação, executando primeiro para vetores do tamanho de 100.000
         std::vector<long long> lengthLists2 = {100000};
+        std::vector<std::vector<std::vector<long long>>> datasets2 = generateDataset(lengthLists2);
 
-        std::vector<std::vector<std::vector<long long>>> datasets2 = generateDataset(lengthLists2, datasets_name.size());
-
-        runInteration(methods, i, datasets2, datasets_name, "2");
+        // Executando a segunda parte da interação
+        runInteration(methods, i, datasets2, datasets_name, output_path, "2");
     }
 
     return 0;

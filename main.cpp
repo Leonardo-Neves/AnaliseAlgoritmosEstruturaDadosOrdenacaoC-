@@ -158,7 +158,7 @@ int main()
 {
     // Configurações Iniciais
     long long NUMBER_INTERATIONS = 50; // Número de interações que o código vai executar
-    std::string output_path = "/home/leo/AnaliseAlgoritmosEstruturaDadosOrdenacaoC-/output" // Caminho de saída do resultado
+    std::string output_path = "/home/leo/AnaliseAlgoritmosEstruturaDadosOrdenacaoC-/output"; // Caminho de saída do resultado
 
     // Configuração dos métodos que será utilizado em cada interação
     std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods;

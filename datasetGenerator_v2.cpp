@@ -9,6 +9,7 @@
 
 DatasetGenerator::DatasetGenerator() {}
 
+// Método responsável por gerar um vetor de dados ordenados
 std::vector<long long> DatasetGenerator::generateOrdered(long long length) {
     
     std::vector<long long> orderedList(length);
@@ -17,6 +18,7 @@ std::vector<long long> DatasetGenerator::generateOrdered(long long length) {
     return orderedList;
 }
 
+// Método responsável por gerar um vetor de dados ordenados inversamente
 std::vector<long long> DatasetGenerator::generateOrderedInverse(long long length) {
     
     std::vector<long long> orderedInverseList(length);
@@ -26,6 +28,7 @@ std::vector<long long> DatasetGenerator::generateOrderedInverse(long long length
     return orderedInverseList;
 }
 
+// Método responsável por gerar um vetor de dados ordenados parcialmente
 std::vector<long long> DatasetGenerator::generateAlmostOrdered(long long length) {
     
     std::random_device rd;
@@ -50,7 +53,7 @@ std::vector<long long> DatasetGenerator::generateAlmostOrdered(long long length)
     return half;
 }
 
-
+// Método responsável por gerar um vetor de dados ordenados randômicamente
 std::vector<long long> DatasetGenerator::generateRandom(long long length) {
     
     std::random_device rd;
@@ -71,6 +74,7 @@ std::vector<long long> DatasetGenerator::generateRandom(long long length) {
     return randomList;
 }
 
+// Método responsável por gerar um vetor de dados ordenados randômicamente com dados repetidos
 std::vector<long long> DatasetGenerator::generateRandomWithRepeats(long long length) {
     std::vector<long long> result;
 

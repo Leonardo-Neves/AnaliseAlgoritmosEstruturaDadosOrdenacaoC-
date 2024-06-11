@@ -29,11 +29,15 @@ std::mutex mtx;
 
 // Este método é responsável em executar um algoritmo, medir o tempo de CPU time e gravar os resultados de movimentações, comparações e tempo de execução em um arquivo CSV
 void runExperiment(long long iteration, const std::string& functionName, const std::function<std::pair<std::vector<long long>, std::pair<long long, long long>>(std::vector<long long>)>& method, const std::vector<long long>& dataset, const std::string& datasetName, std::ofstream& file) {
+
+    // Executando o método e mensurando o tempo de execução
     std::clock_t start = std::clock();
     auto result = method(dataset);
     std::clock_t end = std::clock();
+
     long double diff = 1000.0 * (end - start) / CLOCKS_PER_SEC;
 
+    // Registrando resultados no arquivo CSV
     {
         std::lock_guard<std::mutex> lock(mtx);
         file << iteration + 1 << ";" << functionName << ";" << datasetName << ";" 
@@ -45,17 +49,21 @@ void runExperiment(long long iteration, const std::string& functionName, const s
 // Este método é responsável por executar um interação do código, o que envolve executar um conjunto de dados sobre uma série de métodos utilizando computação paralela
 void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods, long long iteration, std::vector<std::vector<std::vector<long long>>> datasets, std::vector<std::string> datasets_name, std::string output_path, std::string posfixo = "") {
 
+    // Interando sobre cada método
     for (auto function = methods.begin(); function != methods.end(); ++function) {
 
+        // Obtendo tempo atual
         auto now = std::chrono::system_clock::now();
         std::time_t now_time = std::chrono::system_clock::to_time_t(now);
         std::tm* now_tm = std::localtime(&now_time);
 
+        // Criando arquivo CSV de saída
         char time_str[100];
         std::strftime(time_str, sizeof(time_str), "%Y-%m-%d_%H-%M-%S", now_tm);
         std::string filename = output_path + "/output_" + function->first + "_" + std::string(time_str) + "_" + std::to_string(iteration) + "_" + posfixo + ".csv";
         std::ofstream file(filename);
 
+        // Criando threads para executar os algoritmos em paralelo
         if (file.is_open()) {
             file << "Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
 
@@ -80,40 +88,67 @@ void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::
 // Este método é responsável por gerar um conjunto de dados baseado em um vetor de entrada, que em cada posição do vetor, um número indicando o comprimento do vetor que será gerado
 std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<long long> lengthLists) {
 
+    /*
+        Exemplo de vetor de saída
+        [
+            [   Ordered
+                [0 ... 10],
+                [0 ... 100],
+                [0 ... 1000],
+                [0 ... 10000]
+            ],
+            [   OrderedInverse
+                [0 ... 10],
+                [0 ... 100],
+                [0 ... 1000],
+                [0 ... 10000]
+            ],
+            [   AlmostOrdered
+                [0 ... 10],
+                [0 ... 100],
+                [0 ... 1000],
+                [0 ... 10000]
+            ],
+            [   Random
+                [0 ... 10],
+                [0 ... 100],
+                [0 ... 1000],
+                [0 ... 10000]
+            ],
+        ]
+    */
+
+    // Criando uma instância do gerador de conjunto de dados
     DatasetGenerator datasetGenerator;
 
     std::vector<std::vector<std::vector<long long>>> datasets;
 
+    // Gerando parte do conjunto de dados para dados ordenados
     std::vector<std::vector<long long>> datasets_temporary_ordered;
-
     for (long long i = 0; i < lengthLists.size(); ++i) {
         datasets_temporary_ordered.push_back(datasetGenerator.generateOrdered(lengthLists[i]));
     }
-
     datasets.push_back(datasets_temporary_ordered);
 
+    // Gerando parte do conjunto de dados para dados ordenados inversamente
     std::vector<std::vector<long long>> datasets_temporary_ordered_inverse;
-
     for (long long i = 0; i < lengthLists.size(); ++i) {
         datasets_temporary_ordered_inverse.push_back(datasetGenerator.generateOrderedInverse(lengthLists[i]));
     }
-
     datasets.push_back(datasets_temporary_ordered_inverse);
 
+    // Gerando parte do conjunto de dados para dados ordenados parcialmente
     std::vector<std::vector<long long>> datasets_temporary_almost_ordered;
-
     for (long long i = 0; i < lengthLists.size(); ++i) {
         datasets_temporary_almost_ordered.push_back(datasetGenerator.generateAlmostOrdered(lengthLists[i]));
     }
-
     datasets.push_back(datasets_temporary_almost_ordered);
 
+    // Gerando parte do conjunto de dados para dados ordenados randômicamente
     std::vector<std::vector<long long>> datasets_temporary_random;
-
     for (long long i = 0; i < lengthLists.size(); ++i) {
         datasets_temporary_random.push_back(datasetGenerator.generateRandom(lengthLists[i]));
     }
-
     datasets.push_back(datasets_temporary_random);
 
     return datasets;

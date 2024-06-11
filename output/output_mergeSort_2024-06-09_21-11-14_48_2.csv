@@ -1,5 +1,0 @@
-Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements
-49;mergeSort;Ordered;100000;5299.78;5279005;5579005
-49;mergeSort;OrderedInverse;100000;5398.58;5279005;5579005
-49;mergeSort;AlmostOrdered;100000;5334.92;5279005;5579005
-49;mergeSort;Random;100000;5362.61;5279005;5579005

@@ -1,0 +1,5 @@
+Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements
+13;heapSort;Ordered;100000;7807.51;2482077;6272611
+13;heapSort;OrderedInverse;100000;7852.96;2361178;5724160
+13;heapSort;AlmostOrdered;100000;7873.43;2430694;6114312
+13;heapSort;Random;100000;7774.77;2431094;6012072

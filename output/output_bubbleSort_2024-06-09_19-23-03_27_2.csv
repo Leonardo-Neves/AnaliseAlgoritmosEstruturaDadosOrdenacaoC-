@@ -1,0 +1,5 @@
+Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements
+28;bubbleSort;Ordered;100000;0.409;100001;3
+28;bubbleSort;OrderedInverse;100000;26535.1;9999999999;19999900001
+28;bubbleSort;AlmostOrdered;100000;11351.9;4362479043;2489544776
+28;bubbleSort;Random;100000;27506.7;7505823797;10023343426

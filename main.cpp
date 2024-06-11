@@ -21,20 +21,18 @@
 #include "bubbleSort.h"
 #include "splaySort.h"
 
-#include "datasetGenerator.h"
+#include "datasetGenerator_v2.h"
 
 using namespace std;
 
 std::mutex mtx;
 
-std::string csv = "Interation;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
-
 void runExperiment(
-    int iteration, 
+    long long iteration, 
     const std::string& functionName,
-    const std::function<std::pair<std::vector<int>, 
-    std::pair<int, int>>(std::vector<int>)>& method,
-    const std::vector<int>& dataset, 
+    const std::function<std::pair<std::vector<long long>, 
+    std::pair<long long, long long>>(std::vector<long long>)>& method,
+    const std::vector<long long>& dataset, 
     const std::string& datasetName, 
     std::ofstream& file
 ) {
@@ -52,14 +50,86 @@ void runExperiment(
     }
 }
 
+void runInteration(std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods, long long iteration, std::vector<std::vector<std::vector<long long>>> datasets, std::vector<std::string> datasets_name, std::string posfixo) {
+
+    for (auto function = methods.begin(); function != methods.end(); ++function) {
+
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+        std::tm* now_tm = std::localtime(&now_time);
+
+        char time_str[100];
+        std::strftime(time_str, sizeof(time_str), "%Y-%m-%d_%H-%M-%S", now_tm);
+        std::string filename = "/home/leo/AnaliseAlgoritmosEstruturaDadosOrdenacaoC-/output/output_" + function->first + "_" + std::string(time_str) + "_" + std::to_string(iteration) + "_" + posfixo + ".csv";
+        std::ofstream file(filename);
+
+        if (file.is_open()) {
+            file << "Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
+
+            for (long long i = 0; i < datasets.size(); ++i) {
+
+                std::vector<std::thread> threads;
+
+                for (long long j = 0; j < datasets[i].size(); ++j) {
+                    threads.emplace_back(runExperiment, iteration, function->first, function->second, datasets[i][j], datasets_name[i], std::ref(file));
+                }
+
+                for (long long i = 0; i < threads.size(); ++i) {
+                    threads[i].join();
+                }
+            }
+        }
+
+        file.close();
+    }
+}
+
+std::vector<std::vector<std::vector<long long>>> generateDataset(std::vector<long long> lengthLists, long long repeat) {
+
+    DatasetGenerator datasetGenerator;
+
+    std::vector<std::vector<std::vector<long long>>> datasets;
+
+    std::vector<std::vector<long long>> datasets_temporary_ordered;
+
+    for (long long i = 0; i < lengthLists.size(); ++i) {
+        datasets_temporary_ordered.push_back(datasetGenerator.generateOrdered(lengthLists[i]));
+    }
+
+    datasets.push_back(datasets_temporary_ordered);
+
+    std::vector<std::vector<long long>> datasets_temporary_ordered_inverse;
+
+    for (long long i = 0; i < lengthLists.size(); ++i) {
+        datasets_temporary_ordered_inverse.push_back(datasetGenerator.generateOrderedInverse(lengthLists[i]));
+    }
+
+    datasets.push_back(datasets_temporary_ordered_inverse);
+
+    std::vector<std::vector<long long>> datasets_temporary_almost_ordered;
+
+    for (long long i = 0; i < lengthLists.size(); ++i) {
+        datasets_temporary_almost_ordered.push_back(datasetGenerator.generateAlmostOrdered(lengthLists[i]));
+    }
+
+    datasets.push_back(datasets_temporary_almost_ordered);
+
+    std::vector<std::vector<long long>> datasets_temporary_random;
+
+    for (long long i = 0; i < lengthLists.size(); ++i) {
+        datasets_temporary_random.push_back(datasetGenerator.generateRandom(lengthLists[i]));
+    }
+
+    datasets.push_back(datasets_temporary_random);
+
+    return datasets;
+}
+
 int main()
 {
-    std::vector<int> lengthLists = {10, 100, 1000, 10000, 100000, 1000000};
-    int NUMBER_INTERATIONS = 1;
+    long long NUMBER_INTERATIONS = 50;
 
-    DatasetGenerator datasetGenerator(lengthLists);
-
-    std::map<std::string, std::pair<std::vector<int>, std::pair<int, int>>(*)(std::vector<int>)> methods;
+    std::map<std::string, std::pair<std::vector<long long>, std::pair<long long, long long>>(*)(std::vector<long long>)> methods;
     methods["selectionSort"] = selectionSort;
     methods["quickSort"] = quickSort;
     methods["mergeSort"] = mergeSort;
@@ -68,56 +138,26 @@ int main()
     methods["bubbleSort"] = bubbleSort;
     methods["splaySort"] = splaySort;
 
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-    std::tm* now_tm = std::localtime(&now_time);
+    std::vector<std::string> datasets_name = {
+        "Ordered",
+        "OrderedInverse",
+        "AlmostOrdered",
+        "Random"
+    };
 
-    char filename[100];
-    std::strftime(filename, sizeof(filename), "output_%Y-%m-%d_%H-%M-%S.csv", now_tm);
+    for (long long i = 0; i < NUMBER_INTERATIONS; ++i) {
 
-    std::ofstream file(filename);
+        std::vector<long long> lengthLists1 = {10, 100, 1000, 10000};
 
-    if (file.is_open()) {
+        std::vector<std::vector<std::vector<long long>>> datasets1 = generateDataset(lengthLists1, datasets_name.size());
 
-        file << "Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements\n";
+        runInteration(methods, i, datasets1, datasets_name, "1");
 
-        for (int iteration = 0; iteration < NUMBER_INTERATIONS; ++iteration) {
+        std::vector<long long> lengthLists2 = {100000};
 
-            
+        std::vector<std::vector<std::vector<long long>>> datasets2 = generateDataset(lengthLists2, datasets_name.size());
 
-            std::vector<std::vector<std::vector<int>>> datasets {
-                datasetGenerator.generateOrdered(),
-                datasetGenerator.generateOrderedInverse(),
-                datasetGenerator.generateAlmostOrdered(),
-                datasetGenerator.generateRandom()
-            };
-
-            std::vector<std::string> datasets_name = {
-                "Ordered",
-                "OrderedInverse",
-                "AlmostOrdered",
-                "Random"
-            };
-
-            for (auto function = methods.begin(); function != methods.end(); ++function) {
-
-                std::vector<std::thread> threads;
-
-                for (int i = 0; i < datasets.size(); ++i) {
-                    for (int j = 0; j < datasets[i].size(); ++j) {
-                        threads.emplace_back(runExperiment, iteration, function->first, function->second, datasets[i][j], datasets_name[i], std::ref(file));
-                    }
-                }
-
-                for (int i = 0; i < threads.size(); ++i) {
-                    threads[i].join();
-                }
-            }
-
-            
-        }
-
-        file.close();
+        runInteration(methods, i, datasets2, datasets_name, "2");
     }
 
     return 0;

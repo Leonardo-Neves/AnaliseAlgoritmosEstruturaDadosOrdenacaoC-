@@ -1,0 +1,17 @@
+Iteration;Algorithm;DatasetName;DatasetSize;Time;Counter Comparisons;Counter Movements
+27;insertionSort;Ordered;10;0.011;27;27
+27;insertionSort;Ordered;100;0.074;297;297
+27;insertionSort;Ordered;1000;0.184;2997;2997
+27;insertionSort;Ordered;10000;0.093;29997;29997
+27;insertionSort;OrderedInverse;10;0.004;99;108
+27;insertionSort;OrderedInverse;100;0.082;9999;10098
+27;insertionSort;OrderedInverse;1000;1.95;999999;1000998
+27;insertionSort;OrderedInverse;10000;171.67;99999999;100009998
+27;insertionSort;AlmostOrdered;10;0.003;35;35
+27;insertionSort;AlmostOrdered;100;0.005;1635;1635
+27;insertionSort;AlmostOrdered;1000;0.397;124379;124379
+27;insertionSort;AlmostOrdered;10000;21.583;12416959;12416959
+27;insertionSort;Random;10;0.039;71;73
+27;insertionSort;Random;100;0.012;5321;5323
+27;insertionSort;Random;1000;0.935;491993;491998
+27;insertionSort;Random;10000;86.123;50256539;50256549
